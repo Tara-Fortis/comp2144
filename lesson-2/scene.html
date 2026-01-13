@@ -46,11 +46,11 @@
             let material = new BABYLON.StandardMaterial("material", scene);
             material.diffuseColor = new BABYLON.Color3(1.0, 0.0, 0.0);
             sphere.material = material;
-            
-            const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
-            camera.attachControl(canvas, true); // Attach camera control to the canvas
+
+            // const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
+            // camera.attachControl(canvas, true); // Attach camera control to the canvas
             // Replace the above camera with the below XR if you have a headset
-            // const xr = scene.createDefaultXRExperienceAsync();
+            const xr = scene.createDefaultXRExperienceAsync();
  
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
             // STEP 8b: Return the scene
