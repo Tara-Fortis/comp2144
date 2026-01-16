@@ -76,8 +76,27 @@
             let roofMat = new BABYLON.StandardMaterial("roofMat");
             roofMat.diffuseTexture = new BABYLON.Texture("https://www.babylonjs-playground.com/textures/space/space_back.jpg");
             roof.material = roofMat;
+            // suggested by ChatGPT
+            // Fallback camera (REQUIRED for XR)
+            const camera = new BABYLON.UniversalCamera(
+                "camera",
+                new BABYLON.Vector3(0, 1.6, -5),
+                scene
+            );
+            camera.setTarget(BABYLON.Vector3.Zero());
+            camera.attachControl(canvas, true);
 
-            const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
+            // XR must be async and AFTER camera exists
+            scene.createDefaultXRExperienceAsync().then((xr) => {
+                // Optional: disable fallback camera when entering XR
+                xr.baseExperience.onStateChangedObservable.add((state) => {
+                    if (state === BABYLON.WebXRState.IN_XR) {
+                        camera.detachControl();
+                    }
+                });
+            });
+            
+            // const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
             // camera.attachControl(canvas, true); // Attach camera control to the canvas
             // Replace the above camera with the below XR if you have a headset
             const xr = scene.createDefaultXRExperienceAsync();
