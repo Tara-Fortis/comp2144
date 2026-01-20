@@ -3,17 +3,18 @@ const canvas = document.getElementById("renderCanvas");
 // Create the BABYON 3D engine, and attach it to the canvas
 const engine = new BABYLON.Engine(canvas, true);
 // The createScene function
-const createScene = async function() {
+const createScene = async function () {
     // Create a new BABYLON scene, passing in the engine as an argument
     const scene = new BABYLON.Scene(engine);
-    
+
     // Add a camera and allow it to control the canvas (the camera path is in an arc)
-    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
-    camera.attachControl(canvas, true);
-    
+    // const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0));
+    // Add Arc Rotate Camera
+    // camera.attachControl(canvas, true);
+
     // Include a light
     const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
-    
+
     // STEP 1: Add a ground 1 unit is approx 1 metre
     const ground = new BABYLON.MeshBuilder.CreateGround("ground", {
         width: 10,
@@ -26,12 +27,12 @@ const createScene = async function() {
 
     // STEP 12b: Add an array to position the image properly on each of the four visible sides (notice we will not set 4 and 5)
     //options parameter to set different images on each side
-       
+
 
     // STEP 2: Add a box to serve as a house
     const box = new BABYLON.MeshBuilder.CreateBox("box", {}); // create 1x1x1 box
     // STEP 12c: Change the above declaration to include a material wrap
-    
+
 
     // STEP 3a: Preview the result - noticing that the box is sunk into the ground
     // STEP 3b: Adjust the vertical position of the box (default box height is 1 size unit)
@@ -43,9 +44,9 @@ const createScene = async function() {
     // box.scaling.z = 3;
     // STEP 5b: ...or use a vector object to scale the box instead
     // STEP 6a: Repostion the box (which is now 1.5 units in height, so to sit on the ground, we need to raise y to 0.75)
-    
+
     // STEP 6b: ...or with a vector object
-    box.scaling = new BABYLON.Vector3(2, 1.5, 3);  
+    box.scaling = new BABYLON.Vector3(2, 1.5, 3);
     // STEP 7: Rotate the box (Babylon.JS uses radians - so convert if you wish)
     box.rotation.y = BABYLON.Tools.ToRadians(45);
     // STEP 11: Add a texture to the walls of the house (the box) (https://www.babylonjs-playground.com/textures/floor.png)
@@ -53,7 +54,7 @@ const createScene = async function() {
     boxMat.diffuseTexture = new BABYLON.Texture("(https://www.babylonjs-playground.com/textures/floor.png");
     box.material = boxMat;
     // STEP 12a: Change the texture above to use an image with doors and windows instead
-    
+
     // STEP 8a: Build a roof - using a cylinder mesh
     const roof = BABYLON.MeshBuilder.CreateCylinder("roof", {
         diameter: 2.8,
@@ -72,12 +73,12 @@ const createScene = async function() {
     roofMat.diffuseTexture = new BABYLON.Texture("https://assets.babylonjs.com/environments/roof.jpg");
     roof.material = roofMat;
     // STEP 13a: Let's combine the box and the roof meshes into one mesh called 'house'
-    
+
     // STEP 13b: Yikes - now the two meshes share the same material - we must allow multiple materials within the same mesh
-    
+
 
     // STEP 14: Create another instance of the house object and place it elsewhere on the ground
-    
+
 
     // STEP 4: Add some ambient sounds ("Chirping Birds Ambience" by Alex from Pixabay - https://pixabay.com/sound-effects/search/birds%20chirping/)
     async function initAudio() {
@@ -92,11 +93,11 @@ const createScene = async function() {
     initAudio();
     // STEP 15a: Set the above createScene() function to async (important, or this will not work)
     // STEP 15b: Create the xrHelper to allow the visitor to choose WebXR if they are able and they'd like
-    // const xr = await scene.createDefaultXRExperienceAsync({
-    //     floorMeshes: [ground],
-    //     optionalFeatures: true
-    // });
-
+    const xr = await scene.createDefaultXRExperienceAsync({ // async so that the scene after the user engages the experience
+        floorMeshes: [ground], // where is the ground
+        optionalFeatures: true // a bunch of extra features
+    });
+    // the above code adds a webXR button to start the experience
     // Return the scene
     return scene;
 };
@@ -107,7 +108,7 @@ createScene().then((sceneToRender) => {
 });
 
 // Add an event listener that adapts to the user resizing the screen
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
     engine.resize();
 });
 
