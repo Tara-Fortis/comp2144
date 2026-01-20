@@ -18,9 +18,11 @@ const createScene = async function() {
     const ground = new BABYLON.MeshBuilder.CreateGround("ground", {
         width: 10,
         height: 10
-    })
+    });
     // STEP 9: Colour the ground
-    
+    const groundMat = new BABYLON.StandardMaterial("groundMat"); // create material
+    groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.4, 0.2); // add color
+    ground.material = groundMat; // attach it to the ground
 
     // STEP 12b: Add an array to position the image properly on each of the four visible sides (notice we will not set 4 and 5)
     //options parameter to set different images on each side
@@ -40,7 +42,6 @@ const createScene = async function() {
     // box.scaling.y = 1.5;
     // box.scaling.z = 3;
     // STEP 5b: ...or use a vector object to scale the box instead
-
     // STEP 6a: Repostion the box (which is now 1.5 units in height, so to sit on the ground, we need to raise y to 0.75)
     
     // STEP 6b: ...or with a vector object
@@ -48,7 +49,9 @@ const createScene = async function() {
     // STEP 7: Rotate the box (Babylon.JS uses radians - so convert if you wish)
     box.rotation.y = BABYLON.Tools.ToRadians(45);
     // STEP 11: Add a texture to the walls of the house (the box) (https://www.babylonjs-playground.com/textures/floor.png)
-        
+    const boxMat = new BABYLON.StandardMaterial("boxMat");
+    boxMat.diffuseTexture = new BABYLON.Texture("(https://www.babylonjs-playground.com/textures/floor.png");
+    box.material = boxMat;
     // STEP 12a: Change the texture above to use an image with doors and windows instead
     
     // STEP 8a: Build a roof - using a cylinder mesh
@@ -65,7 +68,9 @@ const createScene = async function() {
     roof.rotation.y = BABYLON.Tools.ToRadians(-45);
     roof.position = new BABYLON.Vector3(1, 2, 2);
     // STEP 10: Add a texture to the roof (https://assets.babylonjs.com/environments/roof.jpg)
-
+    const roofMat = new BABYLON.StandardMaterial("roofMat"); // create roof material
+    roofMat.diffuseTexture = new BABYLON.Texture("https://assets.babylonjs.com/environments/roof.jpg");
+    roof.material = roofMat;
     // STEP 13a: Let's combine the box and the roof meshes into one mesh called 'house'
     
     // STEP 13b: Yikes - now the two meshes share the same material - we must allow multiple materials within the same mesh
@@ -75,7 +80,16 @@ const createScene = async function() {
     
 
     // STEP 4: Add some ambient sounds ("Chirping Birds Ambience" by Alex from Pixabay - https://pixabay.com/sound-effects/search/birds%20chirping/)
-        
+    async function initAudio() {
+        const audioEngine = await BABYLON.CreateAudioEngineAsync();
+        await audioEngine.unlockAsync();
+        // Audio engine is now ready to play sounds
+        BABYLON.CreateStreamingSoundAsync("birds", "media/chirping-birds-ambience-217410.mp3", {
+            loop: true,
+            autoplay: true
+        }, audioEngine);
+    }
+    initAudio();
     // STEP 15a: Set the above createScene() function to async (important, or this will not work)
     // STEP 15b: Create the xrHelper to allow the visitor to choose WebXR if they are able and they'd like
     // const xr = await scene.createDefaultXRExperienceAsync({
