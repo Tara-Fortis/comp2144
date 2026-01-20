@@ -1,0 +1,23 @@
+@charset "utf-8";
+
+html {
+    box-sizing: border-boxn;
+}
+
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+button {
+    margin: 1em;
+    padding: 5px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    border: 2px solid rgb(187, 67, 231);
+    background-color: rgb(213, 153, 235);
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bolder;
+    font-size: larger;
+    box-shadow: 1px 1px 4px rgba(128, 128, 128, 0.588);
+}
