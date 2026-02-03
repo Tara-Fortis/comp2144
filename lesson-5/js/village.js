@@ -3,17 +3,17 @@ const canvas = document.getElementById("renderCanvas");
 // Create the BABYON 3D engine, and attach it to the canvas
 const engine = new BABYLON.Engine(canvas, true);
 // The createScene function
-const createScene = async function() {
+const createScene = async function () {
     // Create a new BABYLON scene, passing in the engine as an argument
     const scene = new BABYLON.Scene(engine);
-    
+
     // Add a camera and allow it to control the canvas
     const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 15, new BABYLON.Vector3(0, 0, 0)); // Add Arc Rotate Camera
     camera.attachControl(canvas, true);
-    
+
     // Include a light
     const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
-    
+
     // Add a ground
     const ground = BABYLON.MeshBuilder.CreateGround("ground", {
         width: 10,
@@ -31,7 +31,7 @@ const createScene = async function() {
     faceUV[3] = new BABYLON.Vector4(0.0, 0.0, 0.4, 1.0); // left side
 
     // Add a box to serve as a house
-    const box = BABYLON.MeshBuilder.CreateBox("box", {faceUV: faceUV, wrap: true}); // note options parameter to set different images on each side
+    const box = BABYLON.MeshBuilder.CreateBox("box", { faceUV: faceUV, wrap: true }); // note options parameter to set different images on each side
     box.scaling = new BABYLON.Vector3(2, 1.5, 3);
     box.position = new BABYLON.Vector3(1, 0.75, 2)
     box.rotation.y = BABYLON.Tools.ToRadians(45);
@@ -72,7 +72,7 @@ const createScene = async function() {
         loop: true,
         autoplay: true
     });
-    
+
     // Include a 3D model of a tree (https://free3d.com/3d-model/low_poly_tree-816203.html by kipris, from which the .dae file is converted to .glb format using https://convert3d.org/)
     // Drop the tree into the scene using the ImportMeshAsync method (note that the tree is very, very tiny)
     const tree = BABYLON.SceneLoader.ImportMeshAsync("", "./meshes/", "Lowpoly_tree_sample.glb").then((result) => {
@@ -82,18 +82,35 @@ const createScene = async function() {
     });
 
     // STEP 1: Build a simple 1x1 cube car, with a standard material and a color
-    
+    const cart = BABYLON.MeshBuilder.CreateBox("cart");
+    const cartMat = new BABYLON.StandardMaterial("carMat");
+    cartMat.diffuseColor = new BABYLON.Color3(1, 0, 1);
+    cart.material = cartMat;
 
     // STEP 2a: The local coordinates origin of the cube car is the reference point for scaling and positioning it within the scene - move it up 0.5 so that it sits on the ground
-    
+    cart.position = new BABYLON.Vector3(1, 0.5, -0.75);
     // STEP 2b: Move it out of the way so that the 0,0,0 point in the scene is visible for the next mesh we will import
 
     // STEP 3a: Go to TinkerCAD and build a wheel (radius: 2, wall thickness: 1, sides: 12, bevel: 0, bevel segments: 0)
     // STEP 3b: Rotate the wheel 90 degrees and position it at 0,0,0 in the workspace
     // STEP 3c: Export the wheel as a .glb file and put it in the meshes folder
-    
+
     // STEP 4a: Drop the wheel into the scene using the ImportMeshAsync method
-    
+    const wheel1 = BABYLON.SceneLoader.ImportMeshAsync("", "./meshes/", "wheel11.glb").then((result) => {
+        // do this stuff after the mesh has loaded
+        const wheelMesh = result.meshes[0];
+        // grab the bounding box
+        const wheelBounds = result.meshes[1];
+        wheelBounds.showBoundingBox = true;
+        // wheelMesh.position = new BABYLON.Vector3(0, 0, 0);
+        wheelMesh.scaling = new BABYLON.Vector3(100, 100, 100);
+        // attach the wheel to the cart mesh (parent)
+        wheelMesh.parent = cart;
+    }).catch((error) => {
+        // Oops, the mesh didn't load for some reason
+        console.error("Error loading mesh: " + error);
+        return null;
+    });
 
     // STEP 4b: The wheel is 4 units radius, which is too big again - so scale it down to 1/10 the size above
     // STEP 4c: Add a bounding box to the wheel to see the dimensions of the mesh (this can be accessed via the second mesh in the result.meshes array, result.meshes[1])
@@ -104,31 +121,31 @@ const createScene = async function() {
     // STEP6a: Go back to TinkerCAD and export another wheel, but change the color
     // STEP6b: Copy the code in STEP 4 and paste it below, change the the const name and filename to match the new wheel
     // STEP6c: Change the position of the wheel so that it is on the other side of the car
-    
+
 
     // STEP 7: The car's wheels are stuck in the ground - we need to lift the car up so that it sits on the ground
-    
+
 
     // STEP 8: Create a new animation object
-    
+
 
     // STEP 9a: Create an array for keyframes
-     
+
     // STEP 9b: Add the first keyframe - at key 0, the value of position.x is 0
-    
+
     // STEP 9c: at animation key 30, (after 1 sec since animation fps = 30) the value of position.x is 2
-    
+
     // STEP 9d: At animation key 60, the value of position.x is 0 again
-    
+
 
     // STEP 10: Attach the animation keys to the animation object
-    
+
 
     // STEP 11: Add the animation object to the car's animations array
-    
+
 
     // STEP 12: Attach the animation to the scene
-    
+
 
     // STEP 13: Enable the WebXR experience, and walk around your scene using the provided VR headset
     // Check to see if WebXR (immersive-vr, specifically) is supported on this device
@@ -151,7 +168,7 @@ createScene().then((sceneToRender) => {
 });
 
 // Add an event listener that adapts to the user resizing the screen
-window.addEventListener("resize", function() {
+window.addEventListener("resize", function () {
     engine.resize();
 });
 
