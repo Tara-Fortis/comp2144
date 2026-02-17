@@ -35,14 +35,15 @@ const createScene = async function() {
     /* MESHES
     ---------------------------------------------------------------------------------------------------- */
     // STEP 1: Create a simple box, and apply a material and a colour to it.
-    const box = new BABYLON.CreateBox("box", {size: 0.5 }, scene);
+    const box = BABYLON.MeshBuilder.CreateBox("box", {size: 0.5}, scene);
     const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
-    box.material = box.Mat;
+    box.material = boxMat;
     // STEP 4: Move the box so it is not at your feet
-    
+    box.positon.x = 1;
+    box.position.z = 2;
     // STEP 4b: It is embedded in the floor - bring it up 0.25
-    
+    box.postion.y = 0.25;
 
 
     /* SOUNDS
@@ -72,35 +73,38 @@ const createScene = async function() {
     ---------------------------------------------------------------------------------------------------- */
     // STEP 5: A hit-test is a standard feature in AR that permits a ray to be cast from the device (headset or phone) into the real world, and detect where it intersects with a real-world object. This enables AR apps to place objects on surfaces or walls of the real world (https://immersive-web.github.io/hit-test/). To enable hit-testing, use the enableFeature() method of the featuresManager from the base WebXR experience helper.
     // STEP 5a: Create the features manager object
-    
+    const fm = xr.baseExperience.featuresManager;
     // STEP 5b: Enable the hit-test feature
-    
+    const hitTest = fm.enableFeature(BABYLON.WebXRHitTest, "latest");
 
     // STEP 6a: Create a marker to show where a hit-test has registered a surface
-     
+    const marker = BABYLON.MeshBuilder.CreateCynlinder("marker", { diameter: 0.15, height: 0.01 }, sceme);
 
     // STEP 6b: Initialize the Quaternion so the hit-test can control rotation in all dimensions
-    
+    marker.rotationQuaternion = new BABYLON.Quaternion();
     // STEP 6c: Make the marker invisible by default
-    
+    marker.isVisible = false;
     // STEP 6d: Colour the marker
-    
-
+    const markerMat = new BABYLON.StandardMaterial("boxMat", scene);
+    markerMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
+    markerMat.alpha = 0.5;
+    marker.material = markerMat;
     // STEP 7a: Create a variable to store the latest hit-test results
-    
+    let lastHitTest;
     // STEP 7b: Add an event listener for the hit-test results
-    
+    hitTest.onHitTestResultObservable.add((results) => {
         // STEP 7c: If there is a successful hit-test, then make the marker visible
-        
-            
+        if (results.length) {
+            marker.isVisible = true;
             // STEP 7d: Grab the hit-test matrix of coordinates
-            
+            lastHitTest = results[0];
             // STEP 7e: Extract what we need so that the marker is oriented properly on the detected surface
-            
+            lastHitTest.transformationMatrix.decompose(undefined, marker.rotationQuaternion, marker.position);
+        } else {
             // STEP 7f: Otherwise, marker is invisible
-        
-    
-
+            marker.isVisible = false;
+        }
+    });
     /* ANCHORS
     ---------------------------------------------------------------------------------------------------- */
     // STEP 8: Anchors are a feature that allow you to place objects in the real world space and have them stay there, even if the observer moves around. To enable anchors, use the enableFeature() method of the featuresManager from the base WebXR experience helper (https://immersive-web.github.io/anchors/).
