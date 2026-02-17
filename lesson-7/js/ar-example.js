@@ -63,7 +63,7 @@ const createScene = async function() {
             referenceSpaceType: "local-floor"
         },
         // STEP 2c: Meta Quest requires these to be explicitly requested
-        
+        optionalFeatures: ["hit-test", "anchors"]
     });
     // STEP 3: Commit your code and push it to a server, then try it out with a headset - notice how the orange box is right at your feet - 0, 0, 0 is located on the floor at your feet
 
