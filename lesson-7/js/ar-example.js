@@ -35,8 +35,8 @@ const createScene = async function() {
     /* MESHES
     ---------------------------------------------------------------------------------------------------- */
     // STEP 1: Create a simple box, and apply a material and a colour to it.
-    const box = new BABYLON.CreateBox("box", { size: 0.5 }, scene);
-    const boxMaterial = new BABYLON.StandardMaterial("boxMat", scene);
+    const box = new BABYLON.CreateBox("box", {size: 0.5 }, scene);
+    const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
     box.material = box.Mat;
     // STEP 4: Move the box so it is not at your feet
