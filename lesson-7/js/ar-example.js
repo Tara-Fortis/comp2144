@@ -40,10 +40,10 @@ const createScene = async function() {
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
     box.material = boxMat;
     // STEP 4: Move the box so it is not at your feet
-    box.positon.x = 1;
+    box.position.x = 1;
     box.position.z = 2;
     // STEP 4b: It is embedded in the floor - bring it up 0.25
-    box.postion.y = 0.25;
+    box.position.y = 0.25;
 
 
     /* SOUNDS
@@ -78,7 +78,7 @@ const createScene = async function() {
     const hitTest = fm.enableFeature(BABYLON.WebXRHitTest, "latest");
 
     // STEP 6a: Create a marker to show where a hit-test has registered a surface
-    const marker = BABYLON.MeshBuilder.CreateCynlinder("marker", { diameter: 0.15, height: 0.01 }, sceme);
+    const marker = BABYLON.MeshBuilder.CreateCynlinder("marker", { diameter: 0.15, height: 0.01 }, scene);
 
     // STEP 6b: Initialize the Quaternion so the hit-test can control rotation in all dimensions
     marker.rotationQuaternion = new BABYLON.Quaternion();
@@ -109,12 +109,12 @@ const createScene = async function() {
     ---------------------------------------------------------------------------------------------------- */
     // STEP 8: Anchors are a feature that allow you to place objects in the real world space and have them stay there, even if the observer moves around. To enable anchors, use the enableFeature() method of the featuresManager from the base WebXR experience helper (https://immersive-web.github.io/anchors/).
     // STEP 8a: Enable the anchor feature
-    const anchorSystem = fm.enableFeature(BABYLON.webXRAnchorSystem, "latest");
+    const anchorSystem = fm.enableFeature(BABYLON.WebXRAnchorSystem, "latest");
     // STEP 8b: Add event listener for click
     scene.onPointerDown = async () => {
         if (lastHitTest && marker.isVisible) {
             // STEP 8c: Create an anchor point based on the last hit-test coordinates
-            const anchor = await anchorSystem.addAnchorPointUsingHitTestResultsAsync(lastHitTest);
+            const anchor = await anchorSystem.addAnchorPointUsingHitTestResultAsync(lastHitTest);
             // STEP 8d: Build a box to drop on the surface
             const box = buildRandomBox();
             // STEP 8e: Attach the box to the real world!
