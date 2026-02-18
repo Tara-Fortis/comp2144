@@ -134,6 +134,7 @@ const createScene = async function () {
             "sphere",
             { diameter: randomRadius * 2, segments: 16 }, scene);
         sphere.position.y = randomRadius;
+        sphere.bakeCurrentTransformIntoVertices();
         const sphereMat = new BABYLON.StandardMaterial("sphereMat", scene);
         sphereMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
         sphere.material = sphereMat;
