@@ -129,7 +129,7 @@ const createScene = async function () {
     // Function to create a randomly-coloured box mesh
     function buildRandomBox() {
         const randomHeight = Math.floor(Math.random() * 12) + 1;
-        const box = new BABYLON.MeshBuilder.CreateCapsule("box", { height: randomHeight, radius: (Math.floor(Math.random() * 5) + 1) }, scene);
+        const box = new BABYLON.MeshBuilder.CreateCapsule("box", { height: randomHeight, radius: (Math.floor(Math.random() * 0.5) + 1) }, scene);
         box.position.y = randomHeight / 2;
         box.bakeCurrentTransformIntoVertices();
 
