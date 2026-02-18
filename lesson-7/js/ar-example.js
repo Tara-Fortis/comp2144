@@ -1,13 +1,12 @@
-
 // Get the canvas element as a const
 const canvas = document.getElementById("renderCanvas");
 // Create the BABYON 3D engine, and attach it to the canvas
 const engine = new BABYLON.Engine(canvas, true);
 // The createScene function
-const createScene = async function() {
+const createScene = async function () {
     // Create a new BABYLON scene, passing in the engine as an argument
     const scene = new BABYLON.Scene(engine);
-    
+
 
     /* CAMERA
     ---------------------------------------------------------------------------------------------------- */
@@ -35,7 +34,7 @@ const createScene = async function() {
     /* MESHES
     ---------------------------------------------------------------------------------------------------- */
     // STEP 1: Create a simple box, and apply a material and a colour to it.
-    const box = BABYLON.MeshBuilder.CreateBox("box", {size: 0.5}, scene);
+    const box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.5 }, scene);
     const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
     box.material = boxMat;
@@ -45,10 +44,12 @@ const createScene = async function() {
     // STEP 4b: It is embedded in the floor - bring it up 0.25
     box.position.y = 0.25;
 
+    /* LAB C CODE
+    ---------------------------------------------------------------------------------------------------- */
 
     /* SOUNDS
     ---------------------------------------------------------------------------------------------------- */
-    
+
 
     /* ANIMATION
     ---------------------------------------------------------------------------------------------------- */
@@ -101,7 +102,7 @@ const createScene = async function() {
             lastHitTest = results[0];
             // STEP 7e: Extract what we need so that the marker is oriented properly on the detected surface
             lastHitTest.transformationMatrix.decompose(undefined, marker.rotationQuaternion, marker.position);
-        } else {    
+        } else {
             // STEP 7f: Otherwise, marker is invisible
             marker.isVisible = false;
         }
@@ -121,21 +122,29 @@ const createScene = async function() {
             const box = buildRandomBox();
             // STEP 8e: Attach the box to the real world!
             anchor.attachedNode = box;
-        }    
-    }    
-    
-    
+        }
+    }
+
+
     // Function to create a randomly-coloured box mesh
     function buildRandomBox() {
-        const box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.1 }, scene);
-        // Move the box geometry up by half its height (0.05) and "freeze" that as the new zero point so the box is not embedded in the surface
-        box.position.y = 0.05; 
+        const randomHeight = Math.floor(Math.random() * 12) + 1;
+        const box = new BABYLON.MeshBuilder.CreateCapsule("box", { height: randomHeight, radius: (Math.floor(Math.random() * 5) + 1) }, scene);
+        box.position.y = randomHeight / 2;
         box.bakeCurrentTransformIntoVertices();
-        // Colour the box
+
         const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
         boxMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
         box.material = boxMat;
-        return box;
+        // const box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.1 }, scene);
+        // // Move the box geometry up by half its height (0.05) and "freeze" that as the new zero point so the box is not embedded in the surface
+        // box.position.y = 0.05; 
+        // box.bakeCurrentTransformIntoVertices();
+        // // Colour the box
+        // const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
+        // boxMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
+        // box.material = boxMat;
+        // return box;
     }
 
     // Return the scene
