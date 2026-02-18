@@ -145,7 +145,7 @@ const createScene = async function () {
         // const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
         // boxMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
         // box.material = boxMat;
-        // return box;
+        return sphere;
     }
 
     // Return the scene
