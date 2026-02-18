@@ -128,14 +128,15 @@ const createScene = async function () {
 
     // Function to create a randomly-coloured box mesh
     function buildRandomBox() {
-        const randomHeight = Math.floor(Math.random() * 0.5) + 1;
-        const box = new BABYLON.MeshBuilder.CreateCapsule("box", { height: randomHeight, radius: (Math.floor(Math.random()) + 1) }, scene);
-        box.position.y = randomHeight / 2;
-        box.bakeCurrentTransformIntoVertices();
-
-        const boxMat = new BABYLON.StandardMaterial("boxMat", scene);
-        boxMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
-        box.material = boxMat;
+        // create a random radius and store it in a variable
+        const randomRadius = Math.random() * 0.25 + 0.05;
+        const sphere = BABYLON.MeshBuilder.CreateSphere(
+            "sphere",
+            { diameter: randomRadius * 2, segments: 16 }, scene);
+        sphere.position.y = randomRadius;
+        const sphereMat = new BABYLON.StandardMaterial("sphereMat", scene);
+        sphereMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random());
+        sphere.material = sphereMat;
         // const box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.1 }, scene);
         // // Move the box geometry up by half its height (0.05) and "freeze" that as the new zero point so the box is not embedded in the surface
         // box.position.y = 0.05; 
