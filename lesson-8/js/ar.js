@@ -125,7 +125,7 @@ const createScene = async function () {
     };
 
     // STEP 8: Make the can grabbable and moveable (awesome)! 
-    can.bakeCurrentTransformIntoVertices.addBehavior(new BABYLON.SixDofDragBehavior);
+    can.bakeCurrentTransformIntoVertices().addBehavior(new BABYLON.SixDofDragBehavior);
 
 
     // Return the scene
