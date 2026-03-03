@@ -3,7 +3,7 @@ const canvas = document.getElementById("renderCanvas");
 // Create the BABYON 3D engine, and attach it to the canvas
 const engine = new BABYLON.Engine(canvas, true);
 // The createScene function
-const createScene = async function() {
+const createScene = async function () {
     // Create a new BABYLON scene, passing in the engine as an argument
     const scene = new BABYLON.Scene(engine);
     
@@ -34,7 +34,7 @@ const createScene = async function() {
     /* MESHES
     ---------------------------------------------------------------------------------------------------- */
     // Create a simple box, and apply a material and a colour to it.
-    const box = BABYLON.MeshBuilder.CreateBox("box", {size: 0.5}, scene);
+    const box = BABYLON.MeshBuilder.CreateBox("box", { size: 0.5 }, scene);
     const boxMat = new BABYLON.StandardMaterial("boxMat");
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.6, 0);
     box.material = boxMat;
@@ -88,12 +88,17 @@ const createScene = async function() {
         )
     );
     // STEP 4a: Set up a "mouseout" effect - register another action with the registerAction() method
-    
+    box.actionManager.registerAction(
         // STEP 4b: Set up the action to animate the effect once again with InterpolateValueAction
-        
+        new BABYLON.InterpolateValueAction(
             // STEP 4c: Add a hover-out action with OnPointerOutTrigger, to scale the box back to its original size over a quarter of a second
-            
-
+            BABYLON.ActionManager.OnPointerOutTrigger,
+            box,
+            "scaling",
+            new BABYLON.Vector3(1, 1, 1),
+            250
+        )
+    )
     // STEP 5a: Set up a "click" effect - register a third action
     
         //STEP 5b: Set up the action to change the color value
