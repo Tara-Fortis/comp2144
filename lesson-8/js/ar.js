@@ -38,6 +38,8 @@ const createScene = async function() {
     const boxMat = new BABYLON.StandardMaterial("boxMat");
     boxMat.diffuseColor = new BABYLON.Color3(1, 0.6, 0);
     box.material = boxMat;
+    box.position.z = 2;
+    box.position.x = 0.5;
     // The initial position of the box is 0, 0, 0 so with the referenceSpaceType: "unbounded" it will be located on the viewer's head, which is the origin point of the scene - reposition the box as you'd like
     // box.position.y = 0.5;
     // box.position.z = 0.5;
@@ -81,7 +83,7 @@ const createScene = async function() {
             BABYLON.ActionManager.OnPointerOverTrigger,
             box,
             "scaling",
-            new BABYLON.Vector(1.2, 1.2, 1.2),
+            new BABYLON.Vector3(1.2, 1.2, 1.2),
             250
         )
     );
