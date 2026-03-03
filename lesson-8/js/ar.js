@@ -100,7 +100,7 @@ const createScene = async function () {
         )
     )
     // STEP 5a: Set up a "click" effect - register a third action
-    
+    // box.actionManager.registerAction()
         //STEP 5b: Set up the action to change the color value
 
             // STEP 5c: Add a click action, and use a random color
@@ -109,14 +109,18 @@ const createScene = async function () {
 
 
     // STEP 6a: Instead, let's register one action to run some code on each click - this will side-step the issue
-    
+    box.actionManager.registerAction(
         // STEP 6b: Add a new BABYLON.ExecuteCodeAction
-        
+        new BABYLON.ExecuteCodeAction(
             // STEP 6c: Add a OnPickTrigger that references a function called changeBoxColor
-            
-
+            BABYLON.ActionManager.OnPickTrigger,
+            changeBoxColor
+        )
+    );
     // STEP 6d: Build a simple function to change the material.diffuseColor of the box to a random color
-    
+    function changeBoxColor() {
+        box.material.diffuseColor = BABYLON.Color3.Random();
+    };
 
     // STEP 8: Make the can grabbable and moveable (awesome)! 
     
