@@ -58,7 +58,7 @@ const createScene = async function() {
     /* TEXTBLOCK AND RECTANGLE ELEMENT */
 
     // STEP 1a: Create a simple plane for a rectangle label for the pyramid
-    const plane1 = BABYLON.MeshBuilder.CreatePlane("plane1", 1);
+    const plane1 = BABYLON.Mesh.CreatePlane("plane1", 1);
     // STEP 1b: Set the pyramid as the parent
     plane1.parent = pyramid;
     // STEP 1c: Position it up above the pyramid
@@ -75,7 +75,7 @@ const createScene = async function() {
     rectangle.width = 0.4;
     rectangle.height = "80px";
     rectangle.cornerRadius = 40;
-    rectangle.color = "pink";
+    rectangle.color = "orange";
     rectangle.thickness = 4;
     rectangle.background = "green";
     // STEP 3c: Apply the rectangle GUI element to the texture being applied to plane1
