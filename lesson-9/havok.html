@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebXR: Physics & Plane Detection</title>
+    <!-- IMPORTANT: Complete a room scan first with the headset - Settings > Environment setup > Space setup (this will construct the basic room geometry with furniture) -->
+    <!-- Next, update the room boundary so that you can move freely around the room even with furniture - Settings > Environment setup > Boundary > Create new boundary, then create your own boundary by drawing around the room perimeter -->
+    <!-- STEP 1: Add the Earcut code library for building mesh geometry from the room scan -->
+    <script src="https://unpkg.com/earcut@2.2.4/dist/earcut.min.js"></script>
+    <!-- STEP 2: We need the Havok physics engine -->
+    <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>    
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+
+    <style>
+        body, html { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        #renderCanvas { width: 100%; height: 100%; touch-action: none; }
+    </style>
+</head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("renderCanvas");
+        const engine = new BABYLON.Engine(canvas, true);
+
+        const createScene = async function () {
+            const scene = new BABYLON.Scene(engine);
+
+            // STEP 3: Initialize physics engine
+            const havokInstance = await HavokPhysics();
+            const hk = new BABYLON.HavokPlugin(true, havokInstance);
+            scene.enablePhysics(new BABYLON.Vector3(0, -9.81, 0), hk);
+
+            // Set up basic camera and lights
+            const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 1, 0), scene);
+            camera.attachControl(canvas, true);
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+
+            // STEP 4: Initialize WebXR AR session, and enable plane detection
+            const xr = await scene.createDefaultXRExperienceAsync({
+                uiOptions: {
+                    sessionMode: "immersive-ar",
+                    referenceSpaceType: "local-floor"
+                },
+                optionalFeatures: ["plane-detection"]
+            });
+
+            // STEP 5: Variables for interactive cube and floor 
+            let cube;
+            let cubeAggregate;
+            let floorDetected = false;
+            const dragBehavior = new BABYLON.SixDofDragBehavior();
+            dragBehavior.dragDeltaRatio = 1.0; 
+
+            // STEP 6: When the WebXR session has initialized, create the interactive cube
+            xr.baseExperience.sessionManager.onXRSessionInit.add(() => {
+                cube = BABYLON.MeshBuilder.CreateBox("rubberCube", { size: 0.15 }, scene);
+                cube.position = new BABYLON.Vector3(0, 1.5, 0.5);
+                // STEP 7: Add the cube to the physics engine
+                cubeAggregate = new BABYLON.PhysicsAggregate(cube, BABYLON.PhysicsShapeType.BOX, { mass: 1 }, scene);
+                // STEP 8a: Set the cube initially to ignore physics (KINEMATIC), so we can pick it up
+                cubeAggregate.body.setMotionType(BABYLON.PhysicsMotionType.KINEMATIC);
+                // STEP 8b: Make the cube draggable
+                cube.addBehavior(dragBehavior);
+            });
+
+            // STEP 9: While the cube is being dragged, physics are disabled
+            dragBehavior.onDragStartObservable.add(() => {
+                cubeAggregate.body.setMotionType(BABYLON.PhysicsMotionType.KINEMATIC);
+            });
+
+            // STEP 10a: When the cube is released, set new positioning and motion properties accordingly
+            dragBehavior.onDragEndObservable.add(() => {
+                // STEP 10b: Move physics body to exact mesh position
+                cubeAggregate.body.setTargetTransform(cube.position, cube.rotationQuaternion);
+                // STEP 10c: Reset velocity so it doesn't carry drag momentum
+                cubeAggregate.body.setLinearVelocity(BABYLON.Vector3.Zero());
+                cubeAggregate.body.setAngularVelocity(BABYLON.Vector3.Zero());
+                // STEP 10d: Reactivate physics but only if there is a floor, otherwise it drops into the abyss (never to be seen again...so sad)
+                if (floorDetected) {
+                    cubeAggregate.body.setMotionType(BABYLON.PhysicsMotionType.DYNAMIC);
+                }
+            });
+
+            // Features manager setup to include plane detection
+            const fm = xr.baseExperience.featuresManager;
+            const xrPlanes = fm.enableFeature(BABYLON.WebXRPlaneDetector.Name, "latest");
+            const planeMeshes = {};
+
+            // STEP 11: Function to build/update the physical meshes to represent the horizontal and vertical surfaces in the room
+            const setupPlanePhysics = (plane) => {
+                // STEP 12: Clean up old mesh if it exists
+                if (planeMeshes[plane.id]) {
+                    planeMeshes[plane.id].dispose();
+                }
+
+                // STEP 13: Build the visual polygons to represent the real-world surfaces
+                plane.polygonDefinition.push(plane.polygonDefinition[0]);
+                const triangulation = new BABYLON.PolygonMeshBuilder("p-" + plane.id, plane.polygonDefinition.map(p => new BABYLON.Vector2(p.x, p.z)), scene);
+                const polygon = triangulation.build(false, 0.01);
+                
+                const mat = new BABYLON.StandardMaterial("pMat-" + plane.id, scene);
+                mat.alpha = 0.4;
+                mat.diffuseColor = BABYLON.Color3.Random();
+                polygon.material = mat;
+
+                // STEP 14: Align the meshes to the real world
+                polygon.rotationQuaternion = new BABYLON.Quaternion();
+                plane.transformationMatrix.decompose(polygon.scaling, polygon.rotationQuaternion, polygon.position);
+
+                // STEP 15: Enable physics for each of the planes so the cube will bounce off them, but then need mass=0 so they don't fall down
+                new BABYLON.PhysicsAggregate(polygon, BABYLON.PhysicsShapeType.MESH, { mass: 0, restitution: 0.5 }, scene);
+                
+                planeMeshes[plane.id] = polygon;
+            };
+
+            // STEP 16: Any time a plane is detected by the AR headset, build a plane mesh (with above function)
+            xrPlanes.onPlaneAddedObservable.add(plane => {
+                setupPlanePhysics(plane);
+                // Once we have a floor, the cube is allowed to fall
+                floorDetected = true;
+            });
+            
+            // STEP 17: As the user moves about, plane geometry may need to be updated (with above function)
+            xrPlanes.onPlaneUpdatedObservable.add(plane => setupPlanePhysics(plane));
+            
+            // STEP 18: Garbage collection - get rid of meshes if real-world planes are no longer detected
+            xrPlanes.onPlaneRemovedObservable.add(plane => {
+                if (planeMeshes[plane.id]) {
+                    planeMeshes[plane.id].dispose();
+                    delete planeMeshes[plane.id];
+                }
+            });
+
+            return scene;
+        };
+
+        // Scene rendering loop, as usual
+        createScene().then((sceneToRender) => {
+            engine.runRenderLoop(() => sceneToRender.render());
+        });
+        window.addEventListener("resize", () => engine.resize());
+    </script>
+</body>
+</html>
