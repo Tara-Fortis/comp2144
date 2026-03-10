@@ -64,7 +64,7 @@ const createScene = async function() {
     // STEP 1c: Position it up above the pyramid
     plane1.position.y = 1.5;
     // STEP 1d: Set the billboardMode so that it faces the viewer wherever they go
-    plane1.billBoardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
+    plane1.billboardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
 
     // STEP 2: With GUI controls in 3D, we apply them to a mesh with a texture
     const advancedTexture1 = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(plane1);
@@ -75,9 +75,9 @@ const createScene = async function() {
     rectangle.width = 0.4;
     rectangle.height = "80px";
     rectangle.cornerRadius = 40;
-    rectangle.color = "orange";
+    rectangle.color = "purple";
     rectangle.thickness = 4;
-    rectangle.background = "green";
+    rectangle.background = "white";
     // STEP 3c: Apply the rectangle GUI element to the texture being applied to plane1
     advancedTexture1.addControl(rectangle);
     
@@ -91,23 +91,31 @@ const createScene = async function() {
     /* BUTTON ELEMENT */
 
     // STEP 5a: Create a simple button to identify and control the cylinder, beginning with another plane mesh
-    
+    const plane2 = BABYLON.Mesh.CreatePlane("plane2", 1);
     // STEP 5b: Make plane2 a child of the cylinder and position it above it
-    
+    plane2.parent = cylinder;
+    plane2.position.y = 2;
     // STEP 5c: Set the billboard mode to ALL
-    
+    plane2.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
     // STEP 6: Create a new texture for the GUI elements to apply to plane2
-    
+    const advancedTexture2 = BABYLON.GUI.AdvancedDynamicTexture.CreateForMesh(plane2);
 
     // STEP 7a: Make a BABYLON GUI button element, and add some text 
-    
+    const button = BABYLON.GUI.Button.CreateSimpleButton("button", "Change color");
     // STEP 7b: Set the height, width, color (foreground and background), and the font size
-    
+    button.width = 1;
+    button.height = 0.4;
+    button.color = "white";
+    button.background = "grey";
+    button.fontSize = 50;
+
     // STEP 7c: Add an event handler, and create an anonymous function to change the color of the mesh (see pre-built function changeMeshColor() below)
-    
+    button.onPointerUpObservable.add(function () {
+        changeMeshColor();
+    });
     // STEP 7d: Apply the button to the texture being applied to plane2, then try this GUI element in the headset
-    
+    advancedTexture2.addControl(button);
 
 
     /* SLIDER ELEMENT */
